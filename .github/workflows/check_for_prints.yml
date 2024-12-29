@@ -1,0 +1,27 @@
+name: Check for prints
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-print-statements:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Find Python files with print statements
+        run: |
+          # List all modified Python files in the pull request
+          git diff --name-only origin/main...HEAD | grep -E '\.py$' > changed_files.txt || true
+          
+          # Check for print statements in those files
+          if grep -q 'print(' $(cat changed_files.txt); then
+            echo "Error: Found 'print' statements in Python files:"
+            grep -Hn 'print(' $(cat changed_files.txt)
+            exit 1
+          else
+            echo "No 'print' statements found. Good to go!"
+          fi
