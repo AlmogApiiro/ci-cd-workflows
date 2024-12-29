@@ -1,0 +1,24 @@
+name: Haiku Commit Check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-haiku:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Validate commit messages
+        run: |
+          # Extract all commit messages from the PR
+          git log --format='%B' origin/main...HEAD > commit_messages.txt
+
+          # Python script to validate Haiku structure
+          python .github/scripts/check_haiku.py
